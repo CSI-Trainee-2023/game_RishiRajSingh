@@ -4,6 +4,7 @@ const cont = canvas.getContext('2d')
 canvas.width = innerWidth
 canvas.height =  innerHeight
 
+// GRAVITY 
 const gravity = 0.5 
 
 
@@ -16,8 +17,8 @@ class Player {
             y : 100 
         }
 
-        this.width = 100 
-        this.height = 100 
+        this.width = 50
+        this.height = 50 
 
         this.velocity = {
             x : 0 ,
@@ -30,6 +31,8 @@ class Player {
         cont.fillRect(this.position.x, this.position.y, this.width, this.height)
     }
 
+
+    // *----- Draws player with Updated Co-ordinates -------* // 
     update(){
         
         this.draw()
@@ -63,11 +66,16 @@ class Platform {
     }
 }
 
-
+// Instantiating a player 
 const player = new Player()
+
+
+// Instantiating Platforms 
 const platforms = [new Platform({x : 300 , y : 200}), new Platform({x : 800 , y : 300 })]
 
 
+
+// For Keyup And Key Down 
 const keys = {
     right : {
         pressed : false 
@@ -83,6 +91,9 @@ const keys = {
     }
 }
 
+
+
+// * ------- Animation Player , Backgorund , Etc. ------- *// 
 function animate() {
     cont.clearRect(0,0,canvas.width, canvas.height)
     
@@ -117,7 +128,7 @@ function animate() {
     }
 
 
-    // platform - player collision detection 
+    // *------ Platform - Player collision detection  ------ * //
     platforms.forEach((platform) => {
         if ( player.position.y+ player.height <= platform.position.y  && player.position.y + player.height + player.velocity.y >= platform.position.y && player.position.x + player.width >= platform.position.x && player.position.x <= platform.position.x + platform.width ){
             player.velocity.y = 0 
@@ -127,8 +138,12 @@ function animate() {
     
 
 }
-animate();
+animate(); // Executing Animate Function
 
+
+
+
+// * ---- Defining KeyDown ( holding down ) Behaviour ----*// 
 addEventListener('keydown', ({keyCode}) => {
     console.log(keyCode);
     switch(keyCode){
@@ -152,6 +167,8 @@ addEventListener('keydown', ({keyCode}) => {
     }
 })
 
+
+// *---- Defining Keyup Behaviour ( user leaves the key )  -----* //
 addEventListener('keyup', ({keyCode}) => {
     switch(keyCode){
         case 87 :  player.velocity.y = 0                     

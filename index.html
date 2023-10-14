@@ -4,17 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Mario</title>
-    <style>
-        body{
-            overflow: hidden;
-            margin: 0;
-        }
-
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <canvas></canvas>
+
+    <!-- start screen  -->
+    <div class="mainContainer">
+        <div class="startScreen">
+            <div class="title">
+                Choose The Game To Play
+            </div>
+            <div class="tiles">
+                <div class="spaceInvader">
+                    <img src="assets/spaceInvaderTile.avif">
+                </div>
+                <div class="superMario">
+                    <img src="assets/superMarioTile.jpg">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <canvas onload="spaceInvader()"></canvas>
     <script src="index.js"></script>
 
 </body>  
