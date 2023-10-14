@@ -6,10 +6,13 @@ canvas.height =  innerHeight
 
 const gravity = 0.5 
 
+
+
+// * ------ PLayer class----- * // 
 class Player {
     constructor(){
         this.position = {
-            x : 100 ,
+            x  : 100, 
             y : 100 
         }
 
@@ -43,11 +46,12 @@ class Player {
 }
 
 
+// *----- Platform class -----* // 
 class Platform {
-    constructor() {
+    constructor({x,y}) {
         this.position = {
-            x : 300 ,
-            y : 200 
+            x ,
+            y  
         }
         this.width = 200 
         this.height = 20 
@@ -59,8 +63,9 @@ class Platform {
     }
 }
 
+
 const player = new Player()
-const platform = new Platform()
+const platforms = [new Platform({x : 300 , y : 200}), new Platform({x : 800 , y : 300 })]
 
 
 const keys = {
@@ -69,32 +74,57 @@ const keys = {
     },
     left : {
         pressed : false 
+    },
+    up : {
+        pressed : false 
+    } , 
+    down : {
+        pressed : false 
     }
-
 }
 
 function animate() {
     cont.clearRect(0,0,canvas.width, canvas.height)
     
     player.update()
-    platform.draw() 
-    
+    platforms.forEach((platform) => {
+        platform.draw()
+    });
+        
     requestAnimationFrame(animate);
     
     //*  ----- player horizontal movement -------- *//
-    if( keys.right.pressed && player.position.x + player.width < canvas.width/2) {
+    if( keys.right.pressed && player.position.x + player.width <= canvas.width/2) {
         player.velocity.x =10 
-    } else if ( keys.left.pressed && player.position.x > 100){
+    } else if ( keys.left.pressed && player.position.x >= 100){
         player.velocity.x = -10 
     } else {
         player.velocity.x = 0 
+
+
+        // *--- scroll the background -----* // 
+        if( keys.right.pressed ){
+            platforms.forEach((platform) => {
+                platform.position.x -= 5
+            });
+            
+        } else if( keys.left.pressed) {
+            platforms.forEach((platform) => {
+                platform.position.x += 5 
+            });
+            
+        }
     }
 
 
     // platform - player collision detection 
-    if ( player.position.y+ player.height <= platform.position.y  && player.position.y + player.height + player.velocity.y >= platform.position.y && player.position.x + player.width >= platform.position.x && player.position.x <= platform.position.x + platform.width ){
-        player.velocity.y = 0 
-    }
+    platforms.forEach((platform) => {
+        if ( player.position.y+ player.height <= platform.position.y  && player.position.y + player.height + player.velocity.y >= platform.position.y && player.position.x + player.width >= platform.position.x && player.position.x <= platform.position.x + platform.width ){
+            player.velocity.y = 0 
+        }
+    });
+    
+    
 
 }
 animate();
@@ -102,7 +132,7 @@ animate();
 addEventListener('keydown', ({keyCode}) => {
     console.log(keyCode);
     switch(keyCode){
-        case 87 :  player.velocity.y = -20                 
+        case 87 : player.velocity.y = -20 
                 break ;
         case 38 : player.velocity.y = -20 
                 break ;
