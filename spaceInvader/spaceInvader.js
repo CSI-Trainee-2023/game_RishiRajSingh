@@ -92,7 +92,7 @@ class Enemy{
         }
 
         this.velocity = {
-            x : 5 ,
+            x : 0 ,
             y : 0 
         }
 
@@ -103,7 +103,7 @@ class Enemy{
         this.width = 50
         this.height = 50           
     }
-    // *--- Drawing the spaceship ---*//
+    // *--- Drawing the Invader ---*//
 
     draw(){
         cont.drawImage(this.image, this.position.x, this.position.y, this.width, this.height)
@@ -113,8 +113,8 @@ class Enemy{
     update({velocity}){
         if(this.image){
             this.draw()
-            this.position.x += this.velocity.x 
-            this.position.y += this.velocity.y 
+            this.position.x += velocity.x 
+            this.position.y += velocity.y 
         }
     }
 }
@@ -126,15 +126,18 @@ class Grid {
             y : 0 
         }
         this.velocity = {
-            x : 0 ,
+            x : 3 ,
             y : 0 
         }
 
         this.enemies = []
         const rows = Math.floor(Math.random() * 5  + 1 )
         const columns = Math.floor(Math.random()*5 + 3)
+
+        this.width = columns*50
+
         for ( let i =1 ; i<= columns ; i++ ){
-           for( let j =0 ; j < rows ; j++ ){
+           for( let j =1 ; j < rows ; j++ ){
             this.enemies.push(new Enemy({
                 position : {
                     x : i * 50 ,
@@ -145,7 +148,17 @@ class Grid {
         }
     }
 
-    update() {}
+    update() {
+        this.position.x += this.velocity.x 
+        this.position.y += this.velocity.y
+
+        this.velocity.y = 0
+
+        if( this.position.x + this.width + 50>= canvas.width || this.position.x <= -30){
+            this.velocity.x = -this.velocity.x 
+            this.velocity.y = 30
+        }
+    }
 }
 
 
@@ -156,15 +169,16 @@ const sp = new spaceShip()
 const projectiles = []
 const grids = [new Grid()]
 
+let frames = 0 
 
 function animate(){
     requestAnimationFrame(animate)
     sp.update()
     
     // *--- SpaceShip Horizontal movement ------*//
-    if( keys.right.pressed && sp.position.x + sp.width <= canvas.width){
+    if( keys.right.pressed && sp.position.x + sp.width <= canvas.width+20){
         sp.velocity.x = 4 
-    } else if( keys.left.pressed && sp.position.x >= 0){
+    } else if( keys.left.pressed && sp.position.x >= -20){
         sp.velocity.x = -4 
     } else {
         sp.velocity.x = 0
@@ -182,12 +196,30 @@ function animate(){
 
     grids.forEach((Grid) => {
         Grid.update()
-        Grid.enemies.forEach(enemy => {
+        Grid.enemies.forEach((enemy,i) => {
             enemy.update({
                 velocity : Grid.velocity
             })
+            projectiles.forEach((projectile, j ) => {
+                if(projectile.position.y - projectile.width/2 <=  enemy.position.y + enemy.height && projectile.position.x + projectile.width/2 >= enemy.position.x && projectile.position.x - projectile.width/2 <= enemy.position.x + enemy.width && 
+                projectile.position.y + projectile.width/2 >= enemy.position.y){
+                    setTimeout ( () => {
+                        const invaderFound = Grid.enemies.find((enemy2) => enemy2 === enemy )
+
+                        const projectileFound = projectiles.find( (projectile2) =>  projectile2 === projectile)
+                        if( projectileFound && invaderFound){
+                            Grid.enemies.splice( i, 1)
+                            projectiles.splice( j, 1)
+                        }
+                    }, 0)
+                }
+            })
         })
     })
+    frames++
+    if ( frames % Math.floor((Math.random()*500) + 20) === 0 ){
+        grids.push(new Grid())
+    }
 
 }
 animate() 
