@@ -5,6 +5,7 @@ const cont = canvas.getContext('2d')
 canvas.width = innerWidth
 canvas.height = innerHeight
 
+// * ---- -Music ----- * //
 
 
 // *--- Tracking Keys ----*// 
@@ -82,6 +83,48 @@ class Projectile{
         this.position.y += this.velocity.y 
     }
 }
+// *----- Bombs : Alien's Projectiles -----* //
+class Bomb{
+    constructor(){
+        this.position =  {
+            x : Math.random()*canvas.width,
+            y : 100
+        }
+        this.velocity = {
+            x : 0,
+            y : 5 
+        } 
+
+        
+        const bombBubble = new Image()
+        bombBubble.src = 'assets/bombs.png'
+        this.image = bombBubble 
+        this.width = 40 
+        this.height = 80
+       
+    }
+
+
+    draw() {
+        cont.drawImage(this.image, this.position.x, this.position.y, this.width, this.height)     
+        // cont.fillStyle ='red'  
+        // cont.fillRect(this.position.x, this.position.y, this.width, this.height)        
+    }
+
+    update() {
+        if(this.image){
+            this.draw()
+            this.position.x += this.velocity.x 
+            this.position.y += this.velocity.y 
+        }
+    }
+    // *--- invaders shoot back ----*//  
+    
+}
+
+function blast(bombs){
+    bombs.push(new Bomb())
+}
 
 // * --- Creating Enemies ------ * // 
 class Enemy{
@@ -116,7 +159,7 @@ class Enemy{
             this.position.x += velocity.x 
             this.position.y += velocity.y 
         }
-    }
+    }    
 }
 
 class Grid {
@@ -126,12 +169,12 @@ class Grid {
             y : 0 
         }
         this.velocity = {
-            x : 3 ,
+            x : 4 ,
             y : 0 
         }
 
         this.enemies = []
-        const rows = Math.floor(Math.random() * 5  + 1 )
+        const rows = Math.floor(Math.random()*5  + 1 )
         const columns = Math.floor(Math.random()*5 + 3)
 
         this.width = columns*50
@@ -156,21 +199,25 @@ class Grid {
 
         if( this.position.x + this.width + 50>= canvas.width || this.position.x <= -30){
             this.velocity.x = -this.velocity.x 
-            this.velocity.y = 30
+            this.velocity.y = 100
         }
     }
 }
 
 
 
+
+
 // *-- instantiating and animating spaceship, projectiles, enemies grid  ----* // 
 const sp = new spaceShip() 
-// *--- instantiating projectiles -----* // 
+// *--- instantiating projectiles , enemy grids-----* // 
 const projectiles = []
 const grids = [new Grid()]
+const bombs = []
 
 let frames = 0 
 
+//*---- Animating the whole Game -----*//
 function animate(){
     requestAnimationFrame(animate)
     sp.update()
@@ -194,12 +241,45 @@ function animate(){
         } 
     })
 
+
+    // *--- Invader Projectiles ----*//
+    
+    if( frames % 100 === 0){
+        blast(bombs)        
+    }
+    bombs.forEach((Bomb, index ) => {
+        if ( Bomb.position.y + Bomb.height >= canvas.height){
+            setTimeout( () => {
+                bombs.splice(index, 1)
+            },0)
+        }
+        else {            
+            Bomb.update()
+        }
+        
+        if( Bomb.position.y + Bomb.height >= sp.position.y + 30 && Bomb.position.x + Bomb.width >= sp.position.x + 30 && Bomb.position.x <= sp.position.x + sp.width - 35){
+            console.log(Bomb.position.x + Bomb.width);
+            console.log(sp.position.x);
+            console.log('you lose ');
+            setTimeout( () => {
+                bombs.splice(index, 1)
+            },0)
+        }
+
+    })
+
+   
+    // * ---- Making Grid ----- * //
     grids.forEach((Grid) => {
         Grid.update()
+
+        //*--- Moving Grid ---- *// 
         Grid.enemies.forEach((enemy,i) => {
             enemy.update({
                 velocity : Grid.velocity
             })
+
+            // * ---- Enemy - Projectile Collision ----- *// 
             projectiles.forEach((projectile, j ) => {
                 if(projectile.position.y - projectile.width/2 <=  enemy.position.y + enemy.height && projectile.position.x + projectile.width/2 >= enemy.position.x && projectile.position.x - projectile.width/2 <= enemy.position.x + enemy.width && 
                 projectile.position.y + projectile.width/2 >= enemy.position.y){
@@ -210,17 +290,25 @@ function animate(){
                         if( projectileFound && invaderFound){
                             Grid.enemies.splice( i, 1)
                             projectiles.splice( j, 1)
+
+                            if ( Grid.enemies.length > 0){
+                                const firstEnemy = Grid.enemies[0]
+                                const lastEnemy = Grid.enemies[Grid.enemies.length-1]
+                                Grid.width = lastEnemy.position.x - firstEnemy.position.x + lastEnemy.width
+                            }
                         }
                     }, 0)
                 }
             })
         })
     })
+    //*--- Grid Spawning ----*// 
     frames++
-    if ( frames % Math.floor((Math.random()*500) + 20) === 0 ){
+    if ( frames % Math.floor((Math.random()*500) + 1 ) === 0 ){
         grids.push(new Grid())
-    }
-
+        frames = 0 
+    }     
+    
 }
 animate() 
 
@@ -250,6 +338,7 @@ addEventListener('keydown', ({keyCode}) => {
                 }
             })
         )
+        
     }
 })
 
@@ -266,8 +355,3 @@ addEventListener('keyup', ({keyCode}) => {
                 break ; 
     }
 })
-
-
-
-
-
