@@ -1,6 +1,9 @@
 const canvas = document.querySelector('canvas')
 const cont = canvas.getContext('2d')
 
+const paused = false 
+const explosion = new Audio('assets/explosion.mp3')
+const rocKBreak = new Audio('assets/rockBreak.mp3')
 
 canvas.width = innerWidth
 canvas.height = innerHeight
@@ -219,7 +222,9 @@ let frames = 0
 
 //*---- Animating the whole Game -----*//
 function animate(){
-    requestAnimationFrame(animate)
+    if(paused == false ){
+        requestAnimationFrame(animate)
+    }
     sp.update()
     
     // *--- SpaceShip Horizontal movement ------*//
@@ -256,14 +261,14 @@ function animate(){
         else {            
             Bomb.update()
         }
-        
+        // *--- Bomb : Spaceship --- Collision ---- *// 
         if( Bomb.position.y + Bomb.height >= sp.position.y + 30 && Bomb.position.x + Bomb.width >= sp.position.x + 30 && Bomb.position.x <= sp.position.x + sp.width - 35){
-            console.log(Bomb.position.x + Bomb.width);
-            console.log(sp.position.x);
             console.log('you lose ');
             setTimeout( () => {
                 bombs.splice(index, 1)
             },0)
+            explosion.play()
+            explosion.volume = 0.5
         }
 
     })
@@ -290,6 +295,8 @@ function animate(){
                         if( projectileFound && invaderFound){
                             Grid.enemies.splice( i, 1)
                             projectiles.splice( j, 1)
+                            rocKBreak.play()
+                            rocKBreak.volume = 0.1
 
                             if ( Grid.enemies.length > 0){
                                 const firstEnemy = Grid.enemies[0]
@@ -311,7 +318,6 @@ function animate(){
     
 }
 animate() 
-
 
 
 // *--- SpaceShip Movement ---> KeyDown ----* // 

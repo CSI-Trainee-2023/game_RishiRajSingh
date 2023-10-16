@@ -8,7 +8,7 @@ document.addEventListener('keydown', ({keyCode}) => {
     if( keyCode == 80){
         bgMusic.play()
         bgMusic.loop =true
-        bgMusic.volume =0.5 
+        bgMusic.volume =0.3 
     }
     if ( keyCode == 90){
         bgMusic.pause()
