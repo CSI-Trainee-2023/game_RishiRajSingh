@@ -1,15 +1,55 @@
 const canvas = document.querySelector('canvas')
 const cont = canvas.getContext('2d')
+const scoreSP = document.getElementById('scoreSP')
+let highScore =0 
+const highScoreSp = document.getElementById('highScore')
+highScoreSp.innerHTML = localStorage.getItem('highScore')
+
+let flag ;
 
 const paused = false 
-const explosion = new Audio('assets/explosion.mp3')
-const rocKBreak = new Audio('assets/rockBreak.mp3')
+
 
 canvas.width = innerWidth
 canvas.height = innerHeight
 
 // * ---- -Music ----- * //
+const explosion = new Audio('assets/explosion.mp3')
+const rocKBreak = new Audio('assets/rockBreak.mp3')
 
+// *---- Health Bar ---- *// 
+class health {
+    constructor(){
+        this.position = {
+            x : canvas.width/2 - 250,
+            y : 20
+        }
+        this.width = 500 
+        this.height = 20 
+    }
+    
+    drawGreen(){
+        cont.fillStyle = 'green'
+        cont.fillRect(this.position.x , this.position.y, this.width , this.height)
+    }
+    update(){
+        this.width -= 50
+    }
+}
+class destructionRed{
+    constructor(){
+        this.position = {
+            x : canvas.width/2 - 250,
+            y : 20
+        }
+        this.width = 500 
+        this.height = 20 
+    }
+    drawRed(){
+        cont.fillStyle = 'red'
+        cont.fillRect(this.position.x , this.position.y, this.width , this.height)
+    }
+}
 
 // *--- Tracking Keys ----*// 
 const keys = {
@@ -109,9 +149,7 @@ class Bomb{
 
 
     draw() {
-        cont.drawImage(this.image, this.position.x, this.position.y, this.width, this.height)     
-        // cont.fillStyle ='red'  
-        // cont.fillRect(this.position.x, this.position.y, this.width, this.height)        
+        cont.drawImage(this.image, this.position.x, this.position.y, this.width, this.height)         
     }
 
     update() {
@@ -121,7 +159,6 @@ class Bomb{
             this.position.y += this.velocity.y 
         }
     }
-    // *--- invaders shoot back ----*//  
     
 }
 
@@ -217,6 +254,8 @@ const sp = new spaceShip()
 const projectiles = []
 const grids = [new Grid()]
 const bombs = []
+const healthBar = new health()
+const dBar = new destructionRed()
 
 let frames = 0 
 
@@ -226,7 +265,8 @@ function animate(){
         requestAnimationFrame(animate)
     }
     sp.update()
-    
+    dBar.drawRed()
+    healthBar.drawGreen()    
     // *--- SpaceShip Horizontal movement ------*//
     if( keys.right.pressed && sp.position.x + sp.width <= canvas.width+20){
         sp.velocity.x = 4 
@@ -236,7 +276,7 @@ function animate(){
         sp.velocity.x = 0
     }
 
-    //* ---- projectiles ----* // 
+    //* ---- projectiles ----*// 
     projectiles.forEach( (projectile, index) => {
         if ( projectile.position.y === 0){
             projectiles.splice(index, 1)
@@ -263,7 +303,7 @@ function animate(){
         }
         // *--- Bomb : Spaceship --- Collision ---- *// 
         if( Bomb.position.y + Bomb.height >= sp.position.y + 30 && Bomb.position.x + Bomb.width >= sp.position.x + 30 && Bomb.position.x <= sp.position.x + sp.width - 35){
-            console.log('you lose ');
+            healthBar.update()
             setTimeout( () => {
                 bombs.splice(index, 1)
             },0)
@@ -297,6 +337,18 @@ function animate(){
                             projectiles.splice( j, 1)
                             rocKBreak.play()
                             rocKBreak.volume = 0.1
+                            
+                            highScore += 100 
+                            scoreSP.innerHTML = highScore
+                         if( highScoreSp.innerHTML == 0){
+                            localStorage.setItem('highScore', highScore)
+                         }
+                         else {
+                            flag = localStorage.getItem('highScore')
+                            if( highScore > flag ){
+                                localStorage.setItem('highScore',highScore)
+                            }
+                         }
 
                             if ( Grid.enemies.length > 0){
                                 const firstEnemy = Grid.enemies[0]
@@ -311,7 +363,7 @@ function animate(){
     })
     //*--- Grid Spawning ----*// 
     frames++
-    if ( frames % Math.floor((Math.random()*500) + 1 ) === 0 ){
+    if ( frames % Math.floor((Math.random()*800) + 1 ) === 0 ){
         grids.push(new Grid())
         frames = 0 
     }     
@@ -358,6 +410,8 @@ addEventListener('keyup', ({keyCode}) => {
         case 68 : keys.right.pressed = false  
                 break ;
         case 39 : keys.right.pressed = false 
+                break ; 
+        case 82 : highScoreSp.innerHTML = 0 
                 break ; 
     }
 })

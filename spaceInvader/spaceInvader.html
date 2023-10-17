@@ -13,12 +13,36 @@
         }
         canvas {
             background-image: url('assets/space2.jpg');
-            background-repeat: no-repeat;
+            background-repeat: repeat-y;
             background-size: cover;         
         }
+        .score{  
+            position: fixed ;
+            z-index: 10;
+            color: rgb(250, 250, 22);
+            text-shadow: 0px 0px 6px  whitesmoke;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-size: 25px;
+            left: 30px ;
+            top : 10px ;
+            font-weight: 700;
+        }
+        .score > .scoreContainer {            
+            display: flex;
+            justify-content: space-around;
+        }
+
+        
     </style>
 </head>
 <body>
+    <div class="score">
+        <div class="scoreContainer">
+            <div>Score : <span id="scoreSP">0</span></div>
+            <pre>                                                                     </pre>
+            <div class="hS">Highest Score : <span id="highScore">0</span></div>
+        </div>
+    </div>
     <canvas></canvas>
     <script src="spaceInvader.js"></script>
     <script src="music.js"></script>
