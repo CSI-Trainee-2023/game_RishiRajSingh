@@ -4,18 +4,26 @@ const scoreSP = document.getElementById('scoreSP')
 let highScore =0 
 const highScoreSp = document.getElementById('highScore')
 highScoreSp.innerHTML = localStorage.getItem('highScore')
-
-let flag ;
-
-const paused = false 
-
+const score = document.getElementsByClassName('score')[0]
 
 canvas.width = innerWidth
 canvas.height = innerHeight
 
+
+
 // * ---- -Music ----- * //
 const explosion = new Audio('assets/explosion.mp3')
 const rocKBreak = new Audio('assets/rockBreak.mp3')
+const gameOverSound = new Audio('assets/gameOverSound.mp3')
+
+function gameOver(){
+    canvas.classList.add('hide')
+    score.classList.add('hide')
+    explosion.pause()
+    rocKBreak.pause()
+    gameOverSound.play()
+    gameOverSound.volume = 0.2
+}
 
 // *---- Health Bar ---- *// 
 class health {
@@ -130,12 +138,12 @@ class Projectile{
 class Bomb{
     constructor(){
         this.position =  {
-            x : Math.random()*canvas.width,
+            x : Math.random()*canvas.width + 200,
             y : 100
         }
         this.velocity = {
             x : 0,
-            y : 5 
+            y : 3 
         } 
 
         
@@ -183,8 +191,8 @@ class Enemy{
         image.src = './assets/aliens.png'
 
         this.image = image
-        this.width = 50
-        this.height = 50           
+        this.width = 40
+        this.height = 40           
     }
     // *--- Drawing the Invader ---*//
 
@@ -218,6 +226,7 @@ class Grid {
         const columns = Math.floor(Math.random()*5 + 3)
 
         this.width = columns*50
+        this.rowHeight = rows*50
 
         for ( let i =1 ; i<= columns ; i++ ){
            for( let j =1 ; j < rows ; j++ ){
@@ -261,9 +270,8 @@ let frames = 0
 
 //*---- Animating the whole Game -----*//
 function animate(){
-    if(paused == false ){
-        requestAnimationFrame(animate)
-    }
+    requestAnimationFrame(animate)
+
     sp.update()
     dBar.drawRed()
     healthBar.drawGreen()    
@@ -289,7 +297,7 @@ function animate(){
 
     // *--- Invader Projectiles ----*//
     
-    if( frames % 100 === 0){
+    if( frames % 80 === 0){
         blast(bombs)        
     }
     bombs.forEach((Bomb, index ) => {
@@ -303,12 +311,17 @@ function animate(){
         }
         // *--- Bomb : Spaceship --- Collision ---- *// 
         if( Bomb.position.y + Bomb.height >= sp.position.y + 30 && Bomb.position.x + Bomb.width >= sp.position.x + 30 && Bomb.position.x <= sp.position.x + sp.width - 35){
-            healthBar.update()
+          
             setTimeout( () => {
                 bombs.splice(index, 1)
             },0)
             explosion.play()
             explosion.volume = 0.5
+            healthBar.update()
+            if(healthBar.width === 0 ){
+                gameOver()
+                Bomb.velocity.y =0 
+            }
         }
 
     })
@@ -318,11 +331,18 @@ function animate(){
     grids.forEach((Grid) => {
         Grid.update()
 
+        if( Grid.position.y + Grid.rowHeight >= sp.position.y + 25){
+            gameOver()
+            Grid.velocity = 0
+        }
+
         //*--- Moving Grid ---- *// 
         Grid.enemies.forEach((enemy,i) => {
             enemy.update({
                 velocity : Grid.velocity
             })
+
+            
 
             // * ---- Enemy - Projectile Collision ----- *// 
             projectiles.forEach((projectile, j ) => {
@@ -366,9 +386,10 @@ function animate(){
     if ( frames % Math.floor((Math.random()*800) + 1 ) === 0 ){
         grids.push(new Grid())
         frames = 0 
-    }     
+    }  
     
 }
+
 animate() 
 
 
@@ -411,7 +432,9 @@ addEventListener('keyup', ({keyCode}) => {
                 break ;
         case 39 : keys.right.pressed = false 
                 break ; 
-        case 82 : highScoreSp.innerHTML = 0 
+        case 82 : highScoreSp.innerHTML = "0" 
+                localStorage.setItem('highScore',0)
                 break ; 
     }
 })
+

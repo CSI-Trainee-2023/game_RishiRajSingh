@@ -29,7 +29,63 @@
         }
         .score > .scoreContainer {            
             display: flex;
-            justify-content: space-around;
+        }
+        .gameOver{
+            background-image : url('assets/space.jpg');
+            background-size: no-repeat;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hide{
+            display: none;
+        }
+        .gameOver{
+             display: flex;
+             justify-content: space-around;
+             align-items: center;
+             flex-direction: column;
+             gap: 30px;
+        }
+        #gameOverStyle{
+            background: linear-gradient( 
+            to right, #f34821, #ff6b08, 
+            #cccf23, #eedd44); 
+            backdrop-filter: blur(2px);
+            -webkit-text-fill-color: transparent; 
+            background-clip: text ;
+            -webkit-background-clip: text; 
+            font-size: 50px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-weight: 800;
+            box-shadow: 0px 0px 3px 3px white;
+            box-sizing: border-box;
+            padding: 15px 100px 15px 100px  ;
+            border-radius: 10px;
+        }
+        .playAgain a{
+            background: linear-gradient( 
+            to right, #f34821, #ff6b08, 
+            #cccf23, #eedd44); 
+            backdrop-filter: blur(2px);
+            -webkit-text-fill-color: transparent; 
+            background-clip: text ;
+            -webkit-background-clip: text; 
+            font-size: 20px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-weight: 800;
+            box-shadow: 0px 0px 3px 3px white;
+            box-sizing: border-box;
+            padding: 15px  ;
+            border-radius: 10px;         
+        }
+        .playAgain{
+            transition: 0.5s;
+        }
+        .playAgain:hover{
+            transform: scale(1.05);
         }
 
         
@@ -44,6 +100,11 @@
         </div>
     </div>
     <canvas></canvas>
+
+    <div class="gameOver">
+        <div id="gameOverStyle">Game Over</div>
+        <div class="playAgain"><a href="spaceInvader.html">Play Again</a></div>
+    </div>
     <script src="spaceInvader.js"></script>
     <script src="music.js"></script>
    

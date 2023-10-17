@@ -15,7 +15,7 @@ document.addEventListener('keydown', ({keyCode}) => {
     }
 })
 document.addEventListener('keyup', ({keyCode}) => {
-    if(keyCode == 32 ){
+    if(keyCode == 32){
         blaster.pause();
         blaster.currentTime = 0
     }
