@@ -9,7 +9,7 @@ const score = document.getElementsByClassName('score')[0]
 canvas.width = innerWidth
 canvas.height = innerHeight
 
-
+let gamePause = false 
 
 // * ---- -Music ----- * //
 const explosion = new Audio('assets/explosion.mp3')
@@ -18,7 +18,7 @@ const gameOverSound = new Audio('assets/gameOverSound.mp3')
 
 function gameOver(){
     canvas.classList.add('hide')
-    score.classList.add('hide')
+    score.classList.add('hide') 
     explosion.pause()
     rocKBreak.pause()
     gameOverSound.play()
@@ -134,6 +134,35 @@ class Projectile{
         this.position.y += this.velocity.y 
     }
 }
+
+//*---- Particles Upon projectile-Enemy COllision ---- *// 
+class Particle{
+    constructor({position, velocity, radius}){
+        this.position = position
+        this.velocity = velocity 
+
+        this.radius = radius    
+        this.opacity = 1    
+    }
+    draw() {
+        cont.save()
+        cont.globalAlpha = this.opacity
+        cont.beginPath()
+        cont.arc(this.position.x, this.position.y,this.radius, 0, Math.PI * 2)
+        cont.fillStyle = '#F9B572'
+        cont.fill()
+        cont.closePath()
+        cont.restore()
+    }
+
+    update() {
+        this.draw()
+        this.position.x += this.velocity.x 
+        this.position.y += this.velocity.y 
+        this.opacity -= 0.01
+    }
+}
+
 // *----- Bombs : Alien's Projectiles -----* //
 class Bomb{
     constructor(){
@@ -265,16 +294,29 @@ const grids = [new Grid()]
 const bombs = []
 const healthBar = new health()
 const dBar = new destructionRed()
+const Particles = []
 
 let frames = 0 
 
 //*---- Animating the whole Game -----*//
 function animate(){
+    if(!gamePause){
     requestAnimationFrame(animate)
-
+    }
     sp.update()
     dBar.drawRed()
-    healthBar.drawGreen()    
+    healthBar.drawGreen() 
+    Particles.forEach((Particle, index) => {
+        if(Particle.opacity <= 0 ){
+            setTimeout( () => {
+                Particles.splice(index, 1)
+            })
+        }else {
+            Particle.update()
+        }
+        
+    })
+    
     // *--- SpaceShip Horizontal movement ------*//
     if( keys.right.pressed && sp.position.x + sp.width <= canvas.width+20){
         sp.velocity.x = 4 
@@ -320,6 +362,7 @@ function animate(){
             healthBar.update()
             if(healthBar.width === 0 ){
                 gameOver()
+                gamePause = true
                 Bomb.velocity.y =0 
             }
         }
@@ -331,9 +374,11 @@ function animate(){
     grids.forEach((Grid) => {
         Grid.update()
 
-        if( Grid.position.y + Grid.rowHeight >= sp.position.y + 25){
+        if( Grid.position.y + Grid.rowHeight >= sp.position.y&& Grid.position.x + Grid.width >= sp.position.x + 15 ){
+            Grid.velocity.y = 0
+            Grid.velocity.x = 0
             gameOver()
-            Grid.velocity = 0
+            gamePause = true
         }
 
         //*--- Moving Grid ---- *// 
@@ -348,6 +393,20 @@ function animate(){
             projectiles.forEach((projectile, j ) => {
                 if(projectile.position.y - projectile.width/2 <=  enemy.position.y + enemy.height && projectile.position.x + projectile.width/2 >= enemy.position.x && projectile.position.x - projectile.width/2 <= enemy.position.x + enemy.width && 
                 projectile.position.y + projectile.width/2 >= enemy.position.y){
+                    for(let i=0; i<15; i++){
+                        Particles.push(new Particle({
+                            position : {
+                                x : enemy.position.x + enemy.width/2 ,
+                                y : enemy.position.y + enemy.height/2
+                            },
+                            velocity : {
+                                x : (Math.random() - 0.5)*2 ,
+                                y : (Math.random() - 0.5)*2
+                            },
+                            radius : Math.random()*4 
+                        }))
+                    }
+
                     setTimeout ( () => {
                         const invaderFound = Grid.enemies.find((enemy2) => enemy2 === enemy )
 
@@ -374,6 +433,7 @@ function animate(){
                                 const firstEnemy = Grid.enemies[0]
                                 const lastEnemy = Grid.enemies[Grid.enemies.length-1]
                                 Grid.width = lastEnemy.position.x - firstEnemy.position.x + lastEnemy.width
+                                Grid.rowHeight = lastEnemy.position.y -firstEnemy.position.y
                             }
                         }
                     }, 0)

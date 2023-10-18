@@ -1,3 +1,4 @@
+
 const canvas = document.querySelector('canvas')
 const cont = canvas.getContext('2d')
 
@@ -51,27 +52,62 @@ class Player {
 
 // *----- Platform class -----* // 
 class Platform {
-    constructor({x,y}) {
+    constructor({x,y, width , height}) {
         this.position = {
             x ,
             y  
         }
-        this.width = 200 
-        this.height = 20 
+        this.width = width 
+        this.height = height 
+
+        const platImg = new Image()
+        platImg.src = 'assets/platform.png'
+        this.image = platImg 
     }
 
     draw(){
-        cont.fillStyle = 'blue'
-        cont.fillRect(this.position.x, this.position.y, this.width, this.height)
+        if(this.image){
+             cont.drawImage(this.image, this.position.x , this.position.y, this.width, this.height)
+         }
     }
 }
+
+//*-- Hills , Scenes ---- *// 
+// class Scenery {
+//     constructor({x,y, width , height}) {
+//         this.position = {
+//             x ,
+//             y  
+//         }
+//         this.width = width 
+//         this.height = height 
+
+//         const genImg = new Image()
+//         genImg.src = 'assets/hills.png'
+//         this.image = genImg 
+//     }
+
+//     draw(){
+//         if(this.image){
+//              cont.drawImage(this.image, this.position.x , this.position.y, this.width, this.height)
+//          }
+//     }
+// }
 
 // Instantiating a player 
 const player = new Player()
 
+// const scenes = [new Scenery()]
+
 
 // Instantiating Platforms 
-const platforms = [new Platform({x : 300 , y : 200}), new Platform({x : 800 , y : 300 })]
+const platforms = [
+    new Platform({x : 0 , y : canvas.height - 75, width : 400, height : 75}), 
+    new Platform({x : 798 , y : canvas.height -75 , width : 400, height : 75}), 
+    new Platform({x : 1398 , y : canvas.height -75 , width : 400, height : 75}), 
+    new Platform({x : 1798 , y : canvas.height -75 , width : 400, height : 75}), 
+    new Platform({x : 398 , y : canvas.height -75 , width : 400, height : 75}),
+    new Platform({ x : 500, y : 200 , width : 300, height : 85})]
 
 
 
@@ -116,12 +152,14 @@ function animate() {
         // *--- scroll the background -----* // 
         if( keys.right.pressed ){
             platforms.forEach((platform) => {
-                platform.position.x -= 5
+          
+             platform.position.x -= 5
             });
             
         } else if( keys.left.pressed) {
             platforms.forEach((platform) => {
-                platform.position.x += 5 
+                if( platforms[0].position.x <0 )
+                    platform.position.x += 5 
             });
             
         }
@@ -130,7 +168,7 @@ function animate() {
 
     // *------ Platform - Player collision detection  ------ * //
     platforms.forEach((platform) => {
-        if ( player.position.y+ player.height <= platform.position.y  && player.position.y + player.height + player.velocity.y >= platform.position.y && player.position.x + player.width >= platform.position.x && player.position.x <= platform.position.x + platform.width ){
+        if ( player.position.y+ player.height <= platform.position.y   && player.position.y + player.height + player.velocity.y >= platform.position.y && player.position.x + player.width >= platform.position.x && player.position.x <= platform.position.x + platform.width ){
             player.velocity.y = 0 
         }
     });
