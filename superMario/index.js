@@ -18,18 +18,51 @@ class Player {
             y : 100 
         }
 
-        this.width = 50
-        this.height = 50 
+        this.width = 66
+        this.height = 150 
 
         this.velocity = {
             x : 0 ,
             y : 1 
         }
+
+        const standR = new Image()
+        const standL =new Image()
+        const runR = new Image()
+        const runL = new Image()
+
+        standR.src = 'assets/spriteStandRight.png'
+        standL.src = 'assets/spriteStandLeft.png'
+        runR.src = 'assets/spriteRunRight.png'
+        runL.src = 'assets/spriteRunLeft.png'
+
+        this.frames = 0
+
+        this.sprites = {
+            stand : {
+                right :  standR,
+                left : standL,
+                cropWidth : 177
+            },
+            run : {
+                right : runR,
+                left : runL  ,
+                cropWidth : 340,
+                width : 127.85
+            }
+        }
+        this.currentSprite = this.sprites.stand.right
+        this.currentCropWidth = 177
+
     }
 
+
     draw() {
-        cont.fillStyle = 'red'
-        cont.fillRect(this.position.x, this.position.y, this.width, this.height)
+        // cont.fillStyle = 'red'
+        // cont.fillRect(this.position.x, this.position.y, this.width, this.height)
+        this.frames++
+        if(this.frames > 28) this.frames = 0
+        cont.drawImage(this.currentSprite,this.currentCropWidth*this.frames,0, this.currentCropWidth, 400, this.position.x , this.position.y, this.width, this.height)
     }
 
 
@@ -40,12 +73,13 @@ class Player {
         
         this.position.x += this.velocity.x 
         this.position.y += this.velocity.y
-        if ( this.position.y +  this.velocity.y + this.height <= canvas.height ){
-            this.velocity.y += gravity 
-        }
-        else {
-            this.velocity.y = 0 
-        } 
+        // if ( this.position.y +  this.velocity.y + this.height <= canvas.height ){
+        //     this.velocity.y += gravity 
+        // }
+        // else {
+        //     this.velocity.y = 0 
+        // }
+        this.velocity.y += gravity  
     }
 }
 
@@ -190,16 +224,24 @@ addEventListener('keydown', ({keyCode}) => {
         case 38 : player.velocity.y = -20 
                 break ;
         case 65 : keys.left.pressed = true
+                  player.currentSprite = player.sprites.run.left
+                  player.currentCropWidth = player.sprites.run.cropWidth
+                  player.width = player.sprites.run.width
                 break ;
         case 37 : keys.left.pressed = true 
-                break ;
-        case 83 : console.log('down');
-                break ;
-        case 40 : console.log('down');
+                 player.currentSprite = player.sprites.run.left
+                 player.currentCropWidth = player.sprites.run.cropWidth
+                 player.width = player.sprites.run.width
                 break ;
         case 68 : keys.right.pressed = true 
+                player.currentSprite = player.sprites.run.right
+                player.currentCropWidth = player.sprites.run.cropWidth
+                player.width = player.sprites.run.width
                 break ;
         case 39 : keys.right.pressed = true 
+                 player.currentSprite = player.sprites.run.right
+                 player.currentCropWidth = player.sprites.run.cropWidth
+                 player.width = player.sprites.run.width
                 break ;
 
     }
@@ -213,17 +255,28 @@ addEventListener('keyup', ({keyCode}) => {
                 break ;
         case 38 :  player.velocity.y = 0  
                 break ;     
-        case 65 : keys.left.pressed = false 
+        case 65 : keys.left.pressed = false
+                 player.currentSprite = player.sprites.stand.left
+                 player.currentCropWidth = 177
+                 player.width = 66
                 break ;
         case 37 : keys.left.pressed = false
+               player.currentSprite = player.sprites.stand.left
+               player.currentCropWidth = 177
                 break ;
         case 83 : console.log('down');
                 break ;
         case 40 : console.log('down');
                 break ;
         case 68 : keys.right.pressed = false  
+                player.currentSprite = player.sprites.stand.right
+                player.currentCropWidth = 177
+                player.width = 66
                 break ;
         case 39 : keys.right.pressed = false 
+                 player.currentSprite = player.sprites.stand.right
+                 player.currentCropWidth = 177
+                 player.width = 66
                 break ;  
     }
 })
